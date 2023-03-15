@@ -10,8 +10,10 @@
 
 import ffmpeg
 import os
+import time
 import yt_dlp as yt
 import cv2 as opencv
+import framebuilder
 
 class TV:
 
@@ -28,7 +30,11 @@ class TV:
         # CV variables
         self.cv_init = False
         self.cv_video = None
-        self.cv_frame = 0
+
+        # Timing variables
+        self.time_start_build = 0
+        self.time_end_build = 0
+        self.time_diff = 0
 
         self.yt_opts = {
             'post_hooks': [self.dl_done],
@@ -72,45 +78,26 @@ class TV:
         self.cv_video = opencv.VideoCapture("output.mp4")
         self.cv_init = True
 
-    def convert_pixel_to_ascii(self, val):
-        if (val > 220):
-            return " "
-        elif (val > 150):
-            return "░"
-        elif (val > 100):
-            return "▒"
-        elif (val > 60):
-            return "▓"
-        else:
-            return "█"
+    def get_render_time(self):
+        return self.time_diff
 
     def get_ascii_frame(self):
+        # Start Timer
+        self.time_start_build = time.perf_counter()
+
         # Make sure video is loaded first
         if (self.cv_init == False):
             self.init_cv();            
-
-        # Generate Text 
-        output_string = ""
-        transformed_ascii = []
-
+        
         # Load Image
         success, frame = self.cv_video.read()
 
+        # Use FrameBuilder to Process Image 
         if success:
-            self.cv_frame = self.cv_frame + 1
             opencv.cvtColor(frame, opencv.COLOR_BGR2GRAY)
+            result = framebuilder.FrameBuilder(frame).build_frame()
+            self.time_end_build = time.perf_counter()
 
-            # Process entire frame
-            for i in frame:
-                scanline = []
-                for j in i:
-                    scanline.append(self.convert_pixel_to_ascii(j[0]))
-                transformed_ascii.append(scanline)
-            
-            # Generate output
-            for i in transformed_ascii:
-                output_string = output_string + ''.join(i)
-                output_string = output_string + "\n"
-            
-            return output_string
-        
+            self.time_diff = self.time_end_build - self.time_start_build
+
+            return result
