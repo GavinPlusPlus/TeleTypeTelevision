@@ -5,7 +5,7 @@ import tv
 import time
 import sys
 
-newTV = tv.TV(90, 44, 30, "https://www.youtube.com/watch?v=FtutLA63Cp8")
+newTV = tv.TV(120, 44, 30, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
 # Check for download skip
 if (len(sys.argv) > 1):
