@@ -1,0 +1,15 @@
+# Remove Virtual Enviroment
+.venv
+
+# Remove DS_Store
+.DS_Store
+
+# Remove pyCache
+__pycache__
+
+# Remove VS Settings
+.vscode
+
+# Remove output files
+*.mp4
+*.webm
